@@ -6,8 +6,6 @@ import os
 import sys
 from threading import Thread
 import datetime
-import msvcrt as main
-from speech import Speech
 
 class TEDrecord:
     def __init__(self):
@@ -45,14 +43,13 @@ class TEDrecord:
         waveFile.writeframes(b''.join(frames))
         waveFile.close()
 
-    def playWAV(self):
+    def playWAV(self, music_name):
         '''
         Play (on the attached system sound device) the WAV file
         named wav_filename.'''
         global isPlaying
-        wav_filename = 'resources/test.wav' 
-
-        '''
+        wav_filename = 'resources/' 
+        
         if ('1' in music_name or 'um' in music_name):
             wav_filename = wav_filename + 'jingle.wav'
         elif ('2' in music_name or 'dois' in music_name):
@@ -60,8 +57,7 @@ class TEDrecord:
         elif ('3' in music_name or 'tres' in music_name):
             wav_filename = wav_filename + 'Kazoo.wav'
         elif ('4' in music_name or 'quatro' in music_name):
-            wav_filename = wav_filename + 'Roll.wav
-            '''
+            wav_filename = wav_filename + 'Roll.wav'
         
         try:
             print('Trying to play file' + wav_filename)
@@ -93,52 +89,14 @@ class TEDrecord:
     def continueMusic(self):
         #Play
         if not(self.isPlaying):
-            isPlaying = True
+            self.isPlaying = True
             myThread = threading.Thread(target=loopPlay)
     
     def stopMusic(self):
         if(self.isPlaying):
-            isPlaying = False
+            self.isPlaying = False
 
     def loopPlay(self):
-        while isPlaying:
+        while self.isPlaying:
             print("Playing audio file")
             playWAV()
-
-
-def buttonThread(ted):
-    print("You can talk to TEDiot while the music is playing!")
-    while(ted.isPlaying):
-        input_state = GPIO.input(18)
-        if input_state == False:
-            ted.startRecording()
-
-
-
-def main():
-    ted = TEDrecord()
-    speech = Speech()
-    print("TEDiot is starting.....")
-    while True:
-        input_state = GPIO.input(18)
-        if input_state == False:
-            print("Now TEDiot is listening you...")
-            ted.startRecording()
-            audioResult = speech.speechToText()
-            if not(ted.isPlaying):
-                if any(word in audioResult for word in speech.getKeyWordsPlay):
-                    ted.isPlaying = True
-                    print("Starting button thread...")
-                    t = Thread(target=wait(ted))
-                    ted.playWAV()
-                else:
-                    print("OK!")
-
-if __name__ == "__main__":
-    main()
-
-ted = TEDrecord()
-ted.startRecording()
-ted.isPlaying = True
-ted.playWAV()
-ted.audio.terminate()

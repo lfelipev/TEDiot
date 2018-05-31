@@ -12,6 +12,9 @@ class Speech():
             'resources',
             'file.wav'
         )
+        self.keyWordsPlay = ['toque', 'play', 'teste', 'tocar']
+        self.keyWordsUpdate = ['atualize', 'update']
+        self.keyWordsStop = ['pare', 'para', 'stop']
     
     def speechToText(self):
         with io.open(self.fileName, 'rb') as audioFile:
@@ -19,18 +22,13 @@ class Speech():
             content = audioFile.read()
             audio = types.RecognitionAudio(content=content)
 
-        config = types.RecognitionAudio(
+        config = types.RecognitionConfig(
             encoding=enums.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz=48000,
-            language_code='pt-BR'   
-        )
+            language_code='pt-BR')
 
         print("Detecting speech...")
-        response = client.recognize(config, audio)
+        response = self.client.recognize(config, audio)
 
         for result in response.results:
             return result.alternatives[0].transcript
-    
-    def getKeyWordsPlay(self):
-        keywordsPlay = ['toque', 'play', 'teste', 'tocar']
-        return keywordsPlay
